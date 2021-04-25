@@ -1,0 +1,43 @@
+
+    import Axios from 'axios';
+    
+    export const instagramPhotos = async () => {
+
+    // It will contain our photos' links
+    const res = []
+  
+    try {
+     
+        const userInfoSource = await Axios.get('https://www.instagram.com/p3_calisthenics/?__a=1')
+     //   console.log('asdfsadfsadfdsf',userInfoSource);
+        //userInfoSource.data contains the HTML from Axios
+        const jsonObject = userInfoSource.data.match(/<script type="text\/javascript">window\._sharedData = (.*)<\/script>/)[1].slice(0, -1)
+    //   console.log('4444', jsonObject);
+        const userInfo = JSON.parse(jsonObject)
+    //   console.log('aaaaaaaaavv',userInfo);
+   //    console.log('5555', userInfo);
+      //  Retrieve only the first 10 results
+       console.log('userInfo',userInfo);
+        const mediaArray = userInfo.entry_data.ProfilePage[0].graphql.user.edge_owner_to_timeline_media.edges.splice(0, 10)
+        for (let media of mediaArray) {
+            const node = media.node
+            
+            // Process only if is an image
+            if ((node.__typename && node.__typename !== 'GraphImage')) {
+                continue
+            }
+  
+            // Push the thumbnail src in the array
+            res.push(node.thumbnail_src)
+        }
+  
+        console.log('5555');
+    } catch (e) {
+        console.error('Unable to retrieve photos. Reason: ' + e.toString())
+    }
+    console.log('6666');
+    return res
+  }
+  
+  let a = instagramPhotos()
+  console.log('aaa', a);
